@@ -13,7 +13,10 @@ class Fixture:
     winner: str
     date: str
 
-def parse_fixtures(data: list) -> list[Fixture]:
+def parse_fixtures(data: list | dict) -> list[Fixture]:
+    if isinstance(data, dict):
+        data = [data]
+
     fixtures = []
 
     for item in data:
