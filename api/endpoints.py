@@ -1,7 +1,6 @@
 from api.constants import COMPETITION_IDS 
 from .client import get
 from concurrent.futures import ThreadPoolExecutor
-from datetime import timezone, datetime
 
 def get_competitions() -> dict:
     return (get("/competitions"))
@@ -30,3 +29,5 @@ def get_all_top_scorers() -> list:
         futures = [executor.submit(get_top_scorers, id) for id in COMPETITION_IDS]
         return [f.result() for f in futures]
 
+def get_match(id: int) -> dict:
+    return(get(f"/matches/{id}/"))
