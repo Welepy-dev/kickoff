@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 requests_cache.install_cache(
     "football_cache",
-    expire_afte=432000
+    expire_after=432000
 )
 
 load_dotenv()
