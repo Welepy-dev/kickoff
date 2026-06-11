@@ -1,17 +1,14 @@
-from api.endpoints import get_all_matches
+from api.endpoints import get_all_matches, get_all_top_scorers
 from models.fixture import parse_fixtures
+from models.scorer import parse_scorers
+from ui.app import UI
 
 def main():
-    raw = get_all_matches()
-    fixtures = parse_fixtures(raw)
+    matches = parse_fixtures(get_all_matches())
+    scorers = parse_scorers(get_all_top_scorers())
 
-    # Sort by date ascending (soonest first)
-    # fixtures.sort(key=lambda f: f.date)
-
-    fixtures.sort(key=lambda f: f.date, reverse=True)
-
-    for f in fixtures:
-        print(f"Game: {f.name}, date: {f.date}")
+    ui = UI()
+    ui.run()
 
 if __name__ == "__main__":
     main()
