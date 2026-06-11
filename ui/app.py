@@ -1,25 +1,34 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Footer, Header
+from textual.widgets import Label, Tabs, Tab, ContentSwitcher
+from textual.containers import Vertical, Horizontal
 
 
 class UI(App):
-    """A Textual app to manage stopwatches."""
+    
+    CSS_PATH = "app.css"
 
     BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
 
     def compose(self) -> ComposeResult:
-        """Create child widgets for the app."""
-        yield Header()
-        yield Footer()
+        yield Horizontal (
+            Vertical (
+                Label ("Fixtures"),
+                Tabs (
+                    Tab("Next", id="firstTab"),
+                    Tab("Previous", id="secondTab"),
+                ),
+                id="fixtures"
+            ),
+            Vertical (
+                id="scorers"
+            ),
+            id="main"
+        )
+
+    def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
+        self.query_one(ContentSwitcher).current = event.tab.id
 
     def action_toggle_dark(self) -> None:
-        """An action to toggle dark mode."""
         self.theme = (
             "textual-dark" if self.theme == "textual-light" else "textual-light"
         )
-
-
-if __name__ == "__main__":
-    app = UI()
-    app.run()
-
