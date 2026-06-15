@@ -1,12 +1,22 @@
-/* #main { */
-/* 	border: solid #272727; */
-/* } */
+#main {
+    layout: horizontal;
+    height: 1fr;
+}
 
 #fixtures {
-	border: solid #272727;
+    border: solid #272727;
+    width: 2fr;
 }
 
 #scorers {
-	border: solid #272727;
+    border: solid #272727;
+    width: 1fr;
 }
 
+DataTable {
+    height: 1fr;
+}
+
+LoadingIndicator {
+    height: 3;
+}
