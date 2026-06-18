@@ -54,23 +54,43 @@ class UI(App):
     @work(thread=True)
     def load_scorers(self) -> None:
         scorers = parse_scorers(get_all_top_scorers())
-        scorers = sorted(scorers, key=attrgetter('goals'), reverse=True)
 
-        scorer_rows = []
-
+        # Merge duplicate players across competitions
+        merged: dict[str, dict] = {}
         for scorer in scorers:
-            row = (
-                scorer.player,
-                scorer.goals,
-                scorer.team,
-                scorer.assists
+            key = scorer.player.strip().lower()  # normalize name for matching
+            if key in merged:
+                merged[key]["goals"] += scorer.goals or 0
+                merged[key]["assists"] += scorer.assists or 0
+                # Append team if not already listed
+                if scorer.team not in merged[key]["teams"]:
+                    merged[key]["teams"].append(scorer.team)
+            else:
+                merged[key] = {
+                    "player": scorer.player,
+                    "goals": scorer.goals or 0,
+                    "assists": scorer.assists or 0,
+                    "teams": [scorer.team],
+                }
+
+        # Build rows sorted by goals descending
+        scorer_rows = sorted(
+            merged.values(), key=lambda s: s["goals"], reverse=True
+        )
+        rows = [
+            (
+                entry["player"],
+                entry["goals"],
+                " / ".join(entry["teams"]),  # e.g. "Man City / England"
+                entry["assists"],
             )
-            scorer_rows.append(row)
-        self.app.call_from_thread(self._populate_scorers, scorer_rows)
+            for entry in scorer_rows
+        ]
+
+        self.app.call_from_thread(self._populate_scorers, rows)
 
     def _populate_scorers(self, scorer_rows) -> None:
         self.query_one("#scorers-table", DataTable).add_rows(scorer_rows)
-
 
     @work(thread=True)
     def load_fixtures(self) -> None:
