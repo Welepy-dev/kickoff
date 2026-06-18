@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 requests_cache.install_cache(
     "football_cache",
     backend="sqlite",
-    expire_after=432000,
+    expire_after=3600,
     allowable_methods=["GET"],
     match_headers=False,
     serializer="json",
@@ -23,7 +23,7 @@ BASE_URL = os.getenv("BASE_URL")
 _session = requests_cache.CachedSession(
     "football_cache",
     backend="sqlite",
-    expire_after=432000,
+    expire_after=3600,
     allowable_methods=["GET"],
     match_headers=False,
     serializer="json",
