@@ -1,3 +1,4 @@
+from operator import attrgetter
 from datetime import datetime, timezone
 from api.endpoints import get_all_matches
 from models.fixture import parse_fixtures
@@ -23,11 +24,11 @@ class UI(App):
                 ContentSwitcher(
                     Vertical(
                         LoadingIndicator(id="loading"),
-                        DataTable(id="next-table", show_cursor=False),
+                        DataTable(id="next-table", cursor_type="row"),
                         id="firstTab"
                     ),
                     Vertical(
-                        DataTable(id="previous-table", show_cursor=False),
+                        DataTable(id="previous-table", cursor_type="row"),
                         id="secondTab"
                     ),
                 ),
@@ -40,20 +41,21 @@ class UI(App):
     def on_mount(self) -> None:
         for table_id in ("next-table", "previous-table"):
             table = self.query_one(f"#{table_id}", DataTable)
-            table.add_columns("Date", "Home", "Score / Time", "Away", "Competition")
+            table.add_columns("Date", "Home", "Score", "Away", "Competition")
         self.load_fixtures()
 
     @work(thread=True)
     def load_fixtures(self) -> None:
         now = datetime.now(timezone.utc)
         fixtures = parse_fixtures(get_all_matches())
+        fixtures = sorted(fixtures, key=attrgetter('date'))
 
         next_rows = []
         previous_rows = []
 
         for fixture in fixtures:
             dt = datetime.fromisoformat(fixture.date.replace("Z", "+00:00"))
-            middle = fixture.score if fixture.fulltime else f"{dt.hour:02d}:{dt.minute:02d}"
+            middle = fixture.score
             row = (
                 f"{dt.day:02d}/{dt.month:02d}",
                 fixture.homeTeam or "",
@@ -62,7 +64,7 @@ class UI(App):
                 fixture.competition or "",
             )
             if fixture.fulltime or dt < now:
-                previous_rows.append(row)
+                previous_rows.insert(0, row)
             else:
                 next_rows.append(row)
 
