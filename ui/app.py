@@ -3,16 +3,21 @@ from datetime import datetime, timezone
 from api.endpoints import get_all_matches, get_all_top_scorers
 from models.fixture import parse_fixtures
 from models.scorer import parse_scorers
+
 from textual.app import App, ComposeResult
 from textual.widgets import Label, Tabs, Tab, ContentSwitcher, DataTable, LoadingIndicator
 from textual.containers import Vertical, Horizontal
 from textual import work
+from ui.leaguePopup import LeaguesPopup
 
 class UI(App):
 
     CSS_PATH = "app.css"
 
-    BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
+    BINDINGS = [ 
+        ("d", "toggle_dark", "Toggle dark mode"),
+        ("a", "show_leagues", "Leagues")
+    ]
 
     def compose(self) -> ComposeResult:
         yield Horizontal(
@@ -139,3 +144,5 @@ class UI(App):
         self.theme = (
             "textual-dark" if self.theme == "textual-light" else "textual-light"
         )
+    def action_show_leagues(self) -> None:
+        self.push_screen(LeaguesPopup())
