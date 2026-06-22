@@ -1,5 +1,4 @@
 import os
-import requests
 import requests_cache
 from dotenv import load_dotenv
 

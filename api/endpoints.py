@@ -1,4 +1,4 @@
-from api.constants import COMPETITION_IDS
+from utils import COMPETITION_IDS
 from .client import get
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
