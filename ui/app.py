@@ -5,10 +5,11 @@ from models.fixture import parse_fixtures
 from models.scorer import parse_scorers
 
 from textual.app import App, ComposeResult
-from textual.widgets import Label, Tabs, Tab, ContentSwitcher, DataTable, LoadingIndicator
+from textual.widgets import Label, Tabs, Tab, ContentSwitcher, DataTable, LoadingIndicator, Footer
 from textual.containers import Vertical, Horizontal
 from textual import work
 from ui.leaguePopup import LeaguesPopup
+from ui.leagueScreen import LeagueScreen
 
 class UI(App):
 
@@ -16,7 +17,7 @@ class UI(App):
 
     BINDINGS = [ 
         ("d", "toggle_dark", "Toggle dark mode"),
-        ("a", "show_leagues", "Leagues")
+        ("a", "show_leagues", "Show leagues")
     ]
 
     def compose(self) -> ComposeResult:
@@ -48,6 +49,7 @@ class UI(App):
             ),
             id="main"
         )
+        yield Footer()
 
     def on_mount(self) -> None:
         self.query_one("#scorers-table", DataTable).add_columns("Name", "Goals", "Team", "Assists")
@@ -64,7 +66,7 @@ class UI(App):
         # Merge duplicate players across competitions
         merged: dict[str, dict] = {}
         for scorer in scorers:
-            key = scorer.player.strip().lower()  # normalize name for matching
+            key = scorer.player.strip().lower()
             if key in merged:
                 merged[key]["goals"] += scorer.goals or 0
                 merged[key]["assists"] += scorer.assists or 0
@@ -145,4 +147,11 @@ class UI(App):
             "textual-dark" if self.theme == "textual-light" else "textual-light"
         )
     def action_show_leagues(self) -> None:
-        self.push_screen(LeaguesPopup())
+        self.push_screen(LeaguesPopup(), self.on_league_selected)
+
+    def on_league_selected(self, league: str | None) -> None:
+        if league:
+            self.call_after_refresh(self.go_to_league, league)
+
+    def go_to_league(self, league: str) -> None:
+        self.push_screen(LeagueScreen(league))
