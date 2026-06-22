@@ -19,19 +19,20 @@ class UI(App):
             Vertical(
                 Label("Fixtures"),
                 Tabs(
-                    Tab("Next", id="firstTab"),
-                    Tab("Previous", id="secondTab"),
+                    Tab("Next", id="tab-next"),
+                    Tab("Previous", id="tab-previous"),
                 ),
                 ContentSwitcher(
                     Vertical(
                         LoadingIndicator(id="loading"),
                         DataTable(id="next-table", cursor_type="row"),
-                        id="firstTab"
+                        id="pane-next"
                     ),
                     Vertical(
                         DataTable(id="previous-table", cursor_type="row"),
-                        id="secondTab"
+                        id="pane-previous"
                     ),
+                    initial="pane-next"
                 ),
                 id="fixtures"
             ),
@@ -129,7 +130,10 @@ class UI(App):
         self.query_one("#previous-table", DataTable).add_rows(previous_rows)
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
-        self.query_one(ContentSwitcher).current = event.tab.id
+        if event.tab.id == "tab-next":
+            self.query_one(ContentSwitcher).current = "pane-next"
+        elif event.tab.id == "tab-previous":
+            self.query_one(ContentSwitcher).current = "pane-previous"
 
     def action_toggle_dark(self) -> None:
         self.theme = (
