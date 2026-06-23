@@ -35,3 +35,25 @@ Button {
 	height: 100%;
 	content-align: center middle;
 }
+
+
+DataTable > .datatable--header {
+    background: #272727;
+    color: $text;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: #272727;
+    color: $text;
+}
+
+DataTable > .datatable--fixed {
+    background: $primary;
+    color: $text;
+    text-style: bold;
+}
+
+DataTable > .datatable--fixed-cursor {
+    background: $primary-lighten-1;
+}
