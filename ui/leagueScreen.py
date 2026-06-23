@@ -15,17 +15,13 @@ from textual.widgets import (
 )
 
 from ui.leaguePopup import LeaguesPopup
+from ui.fixture_list import PaginatedFixtureList
 from api.endpoints import get_matches, get_standings, get_top_scorers
 from models.standing import parse_standings
 from models.fixture import parse_fixtures
 from models.scorer import parse_scorers
 from utils import get_competition_id
 from ui.styles import (
-    style_date,
-    style_team,
-    style_score,
-    style_competition,
-    style_time,
     style_position,
     style_standing_team,
     style_stat,
@@ -64,11 +60,11 @@ class LeagueScreen(Screen):
                 ContentSwitcher(
                     Vertical(
                         LoadingIndicator(id="loading"),
-                        DataTable(id="next-table", cursor_type="row"),
+                        PaginatedFixtureList(id="next-fixtures"),
                         id="pane-next",
                     ),
                     Vertical(
-                        DataTable(id="previous-table", cursor_type="row"),
+                        PaginatedFixtureList(id="previous-fixtures"),
                         id="pane-previous",
                     ),
                     initial="pane-next",
@@ -99,12 +95,6 @@ class LeagueScreen(Screen):
         self.query_one("#standings-table", DataTable).add_columns(
             "#", "Team", "MP", "W", "D", "L", "GD", "Last 5"
         )
-
-        for table_id in ("next-table", "previous-table"):
-            table = self.query_one(f"#{table_id}", DataTable)
-            table.add_columns(
-                "Date", "Home", "Score", "Away", "Competition", "Time"
-            )
 
         self.call_after_refresh(self.load_fixtures)
         self.call_after_refresh(self.load_standings)
@@ -151,48 +141,28 @@ class LeagueScreen(Screen):
         fixtures = parse_fixtures(data)
         fixtures = sorted(fixtures, key=attrgetter("date"))
 
-        next_rows = []
-        previous_rows = []
+        next_fixtures = []
+        previous_fixtures = []
 
         for f in fixtures:
             dt = datetime.fromisoformat(f.date.replace("Z", "+00:00"))
-            winner = getattr(f, "winner", "") or ""
-
             if f.fulltime or dt < now:
-                home_wins = winner == "HOME_TEAM"
-                away_wins = winner == "AWAY_TEAM"
-                row = (
-                    style_date(f"{dt.day:02d}/{dt.month:02d}"),
-                    style_team(f.homeTeam or "", is_winner=home_wins, is_loser=away_wins),
-                    style_score(f.score, winner, f.homeTeam or ""),
-                    style_team(f.awayTeam or "", is_winner=away_wins, is_loser=home_wins),
-                    style_competition(f.competition or ""),
-                    style_time(str(dt.time())),
-                )
-                previous_rows.insert(0, row)
+                previous_fixtures.insert(0, f)
             else:
-                row = (
-                    style_date(f"{dt.day:02d}/{dt.month:02d}"),
-                    style_team(f.homeTeam or ""),
-                    style_score(f.score, "", f.homeTeam or ""),
-                    style_team(f.awayTeam or ""),
-                    style_competition(f.competition or ""),
-                    style_time(str(dt.time())),
-                )
-                next_rows.append(row)
+                next_fixtures.append(f)
 
         self.app.call_from_thread(
-            self._populate_fixtures, next_rows, previous_rows
+            self._populate_fixtures, next_fixtures, previous_fixtures
         )
 
-    def _populate_fixtures(self, next_rows, previous_rows) -> None:
+    def _populate_fixtures(self, next_fixtures, previous_fixtures) -> None:
         try:
             self.query_one("#loading").remove()
         except Exception:
             pass
 
-        self.query_one("#next-table", DataTable).add_rows(next_rows)
-        self.query_one("#previous-table", DataTable).add_rows(previous_rows)
+        self.query_one("#next-fixtures", PaginatedFixtureList).load_fixtures(next_fixtures)
+        self.query_one("#previous-fixtures", PaginatedFixtureList).load_fixtures(previous_fixtures)
 
     # ── scorers ────────────────────────────────────────────────────────────
 

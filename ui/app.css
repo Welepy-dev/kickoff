@@ -57,3 +57,12 @@ DataTable > .datatable--fixed {
 DataTable > .datatable--fixed-cursor {
     background: $primary-lighten-1;
 }
+
+.page-btn {
+    height: 3;
+    min-width: 10;
+}
+
+#pagination-bar {
+    height: 3;
+}

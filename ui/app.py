@@ -10,6 +10,7 @@ from textual.containers import Vertical, Horizontal
 from textual import work
 from ui.leaguePopup import LeaguesPopup
 from ui.leagueScreen import LeagueScreen
+from ui.fixture_list import PaginatedFixtureList
 
 class UI(App):
 
@@ -31,11 +32,11 @@ class UI(App):
                 ContentSwitcher(
                     Vertical(
                         LoadingIndicator(id="loading"),
-                        DataTable(id="next-table", cursor_type="row"),
+                        PaginatedFixtureList(id="next-fixtures"),
                         id="pane-next"
                     ),
                     Vertical(
-                        DataTable(id="previous-table", cursor_type="row"),
+                        PaginatedFixtureList(id="previous-fixtures"),
                         id="pane-previous"
                     ),
                     initial="pane-next"
@@ -53,9 +54,6 @@ class UI(App):
 
     def on_mount(self) -> None:
         self.query_one("#scorers-table", DataTable).add_columns("Name", "Goals", "Team", "Assists")
-        for table_id in ("next-table", "previous-table"):
-            table = self.query_one(f"#{table_id}", DataTable)
-            table.add_columns("Date", "Home", "Score", "Away", "Competition", "Time")
         self.call_after_refresh(self.load_fixtures)
         self.call_after_refresh(self.load_scorers)
 
@@ -106,35 +104,26 @@ class UI(App):
         fixtures = parse_fixtures(get_all_matches())
         fixtures = sorted(fixtures, key=attrgetter('date'))
 
-        next_rows = []
-        previous_rows = []
+        next_fixtures = []
+        previous_fixtures = []
 
         for fixture in fixtures:
             dt = datetime.fromisoformat(fixture.date.replace("Z", "+00:00"))
-            middle = fixture.score
-            row = (
-                f"{dt.day:02d}/{dt.month:02d}",
-                fixture.homeTeam or "",
-                middle,
-                fixture.awayTeam or "",
-                fixture.competition or "",
-                str(dt.time()),
-            )
             if fixture.fulltime or dt < now:
-                previous_rows.insert(0, row)
+                previous_fixtures.insert(0, fixture)
             else:
-                next_rows.append(row)
+                next_fixtures.append(fixture)
 
-        self.app.call_from_thread(self._populate_tables, next_rows, previous_rows)
+        self.app.call_from_thread(self._populate_tables, next_fixtures, previous_fixtures)
 
-    def _populate_tables(self, next_rows, previous_rows) -> None:
+    def _populate_tables(self, next_fixtures, previous_fixtures) -> None:
         try:
             self.query_one("#loading").remove()
         except Exception:
             pass
 
-        self.query_one("#next-table", DataTable).add_rows(next_rows)
-        self.query_one("#previous-table", DataTable).add_rows(previous_rows)
+        self.query_one("#next-fixtures", PaginatedFixtureList).load_fixtures(next_fixtures)
+        self.query_one("#previous-fixtures", PaginatedFixtureList).load_fixtures(previous_fixtures)
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
         if event.tab.id == "tab-next":
