@@ -56,8 +56,8 @@ class UI(App):
         for table_id in ("next-table", "previous-table"):
             table = self.query_one(f"#{table_id}", DataTable)
             table.add_columns("Date", "Home", "Score", "Away", "Competition", "Time")
-        self.load_fixtures()
-        self.load_scorers()
+        self.call_after_refresh(self.load_fixtures)
+        self.call_after_refresh(self.load_scorers)
 
     @work(thread=True)
     def load_scorers(self) -> None:

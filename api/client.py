@@ -2,18 +2,6 @@ import os
 import requests_cache
 from dotenv import load_dotenv
 
-# Use a thread-safe SQLite cache backend
-requests_cache.install_cache(
-    "football_cache",
-    backend="sqlite",
-    expire_after=3600,
-    allowable_methods=["GET"],
-    match_headers=False,
-    serializer="json",
-    use_temp=False,
-    connection_kwargs={"check_same_thread": False},
-)
-
 load_dotenv()
 API_KEY = os.getenv("API_TOKEN")
 BASE_URL = os.getenv("BASE_URL")

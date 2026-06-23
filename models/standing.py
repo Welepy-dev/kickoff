@@ -15,8 +15,9 @@ class Standing:
     points: int
     position: int
 
-
 def parse_standings(data: list | dict) -> list[Standing]:
+    if not data:
+        return []
     if isinstance(data, dict):
         data = [data]
     standings = []

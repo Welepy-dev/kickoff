@@ -17,7 +17,7 @@ COMPETITION_IDS = [
 def get_competition_id(competition: str) -> int:
     if competition == "Champions League":
         return UCL_ID
-    if competition == "Europa League":
+    if competition == "Euro":
         return EURO_ID
     if competition == "Premier League":
         return PREMIERLEAGUE_ID

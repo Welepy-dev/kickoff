@@ -13,9 +13,11 @@ class LeaguesPopup(ModalScreen[str]):
             Button("World Cup"),
             Button("Eredivisie"),
             Button("Bundesliga"),
-            Button("Euro"),
             Button("Serie A"),
+            Button("Euro"),
             Button("Ligue 1"),
             Button("Laliga"),
             id="leagueButtons"
         )
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.dismiss(str(event.button.label))
