@@ -50,7 +50,7 @@ def parse_fixtures(data: list | dict) -> list[Fixture]:
                     score=score,
                     winner=match['score']['winner'] or '',
                     date=match["utcDate"],
-                    fulltime=True if match['status'] == 'Finished' else False
+                    fulltime=True if match['status'] == 'FINISHED' else False
                 )
             )
     return fixtures
