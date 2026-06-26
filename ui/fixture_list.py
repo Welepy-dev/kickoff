@@ -10,37 +10,6 @@ from ui.fixture_card import FixtureCard
 
 
 class PaginatedFixtureList(Widget):
-    DEFAULT_CSS = """
-    PaginatedFixtureList {
-        height: 1fr;
-    }
-    #cards-container {
-        height: 1fr;
-        overflow-y: auto;
-    }
-    #cards-container:empty {
-        height: 1fr;
-    }
-    #pagination-bar {
-        height: 3;
-        align: center middle;
-        margin: 0 1;
-    }
-    .page-btn {
-        width: 10;
-    }
-    #page-info {
-        width: auto;
-        margin: 0 2;
-        content-align: center middle;
-    }
-    #empty-label {
-        height: 1fr;
-        content-align: center middle;
-        color: $text-muted;
-    }
-    """
-
     PAGE_SIZE = 8
 
     def __init__(self, fixtures: list[Fixture] | None = None, **kwargs):
