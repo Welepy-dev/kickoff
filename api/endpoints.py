@@ -1,3 +1,4 @@
+import time
 from utils import COMPETITION_IDS
 from .client import get
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -17,7 +18,10 @@ def get_standings(id: int) -> dict:
 def _fetch_all(fn, ids):
     results = [None] * len(ids)
     with ThreadPoolExecutor(max_workers=len(ids)) as executor:
-        future_to_index = {executor.submit(fn, id): i for i, id in enumerate(ids)}
+        future_to_index = {}
+        for i, id in enumerate(ids):
+            future_to_index[executor.submit(fn, id)] = i
+            time.sleep(0.6)
         for future in as_completed(future_to_index):
             i = future_to_index[future]
             results[i] = future.result()
