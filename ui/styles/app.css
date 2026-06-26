@@ -1,0 +1,43 @@
+#main {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#fixtures {
+    border: solid #272727;
+    width: 50%;
+}
+
+Vertical{
+    border: solid #272727;
+    width: 1fr;
+}
+
+DataTable {
+    height: 1fr;
+}
+
+LoadingIndicator {
+    height: 3;
+}
+
+DataTable > .datatable--header {
+    background: #272727;
+    color: $text;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: #272727;
+    color: $text;
+}
+
+DataTable > .datatable--fixed {
+    background: $primary;
+    color: $text;
+    text-style: bold;
+}
+
+DataTable > .datatable--fixed-cursor {
+    background: $primary-lighten-1;
+}

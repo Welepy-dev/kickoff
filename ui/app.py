@@ -14,7 +14,12 @@ from ui.fixture_list import PaginatedFixtureList
 
 class UI(App):
 
-    CSS_PATH = "app.css"
+    CSS_PATH = [
+        "styles/app.css",
+        "styles/fixture_card.css",
+        "styles/fixture_list.css",
+        "styles/league_popup.css",
+    ]
 
     BINDINGS = [ 
         ("d", "toggle_dark", "Toggle dark mode"),
