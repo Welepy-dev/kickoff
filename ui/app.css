@@ -133,11 +133,17 @@ FixtureCard:hover {
 	align: center middle;
 }
 
-.score-home, .score-away {
-    text-style: bold;
+.big-score {
     width: auto;
+    height: auto;
+    content-align: center middle;
 }
 
+/* .score-home, .score-away { */
+/*     text-style: bold; */
+/*     width: auto; */
+/* } */
+/**/
 .vs-label {
 	content-align: center middle;
 	align: center middle;
@@ -182,7 +188,7 @@ FixtureCard:hover {
     height: 1fr;
 }
 
-#empty-label {
+.empty-label {
     height: 1fr;
     content-align: center middle;
     color: $text-muted;
