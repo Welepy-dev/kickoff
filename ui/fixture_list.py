@@ -10,7 +10,7 @@ from ui.fixture_card import FixtureCard
 
 
 class PaginatedFixtureList(Widget):
-    PAGE_SIZE = 8
+    PAGE_SIZE = 5
 
     def __init__(self, fixtures: list[Fixture] | None = None, **kwargs):
         super().__init__(**kwargs)
@@ -59,10 +59,12 @@ class PaginatedFixtureList(Widget):
             date_str = f"{dt.day:02d}/{dt.month:02d} {dt.hour:02d}:{dt.minute:02d}"
             card = FixtureCard(
                 date_str=date_str,
-                matchweek=fixture.matchday,
+                competition=fixture.competition,
+                matchweek=fixture.matchweek,
                 home_team=fixture.homeTeam or "",
                 away_team=fixture.awayTeam or "",
-                score=fixture.score,
+                homeTeamScore=fixture.homeTeamScore,
+                awayTeamScore=fixture.awayTeamScore,
                 is_finished=fixture.fulltime,
                 winner=fixture.winner,
             )

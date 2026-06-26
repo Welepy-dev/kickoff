@@ -8,7 +8,9 @@ class Fixture:
     competition_id: str
     awayTeam: str
     homeTeam: str
-    matchday: int
+    matchweek: int
+    homeTeamScore: int
+    awayTeamScore: int
     score: str
     winner: str
     date: str
@@ -42,7 +44,9 @@ def parse_fixtures(data: list | dict) -> list[Fixture]:
                     competition_id=match["competition"]["id"],
                     homeTeam=home_short,
                     awayTeam=away_short,
-                    matchday=match["matchday"],
+                    matchweek=match["matchday"],
+                    homeTeamScore=match['score']['fullTime']['home'],
+                    awayTeamScore=match['score']['fullTime']['away'],
                     score=score,
                     winner=match['score']['winner'] or '',
                     date=match["utcDate"],
