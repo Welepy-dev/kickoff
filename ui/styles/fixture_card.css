@@ -1,0 +1,99 @@
+/* FixtureCard */
+
+FixtureCard {
+    border: solid $surface;
+    height: 7;
+    margin: 0 1 1 1;
+    padding: 0 0;
+}
+
+FixtureCard:hover {
+	background: $surface;
+}
+
+.card-body {
+    layout: horizontal;
+}
+
+.card-left {
+	align: right top;
+    width: 1fr;
+	border: solid transparent;
+}
+.card-right {
+	align: left top;
+    width: 1fr;
+	border: solid transparent;
+}
+
+.card-date {
+    content-align: center top;
+    height: 1fr;
+    color: $text-muted;
+}
+
+.card-week {
+    height: 1fr;
+    content-align: center top;
+    color: $accent;
+}
+
+.card-home {
+    height: 1fr;
+    content-align: right bottom;
+    text-style: bold;
+}
+/**/
+/* .card-away { */
+/*     height: 1fr; */
+/*     content-align: center bottom; */
+/*     text-style: bold; */
+/* } */
+/**/
+
+.card-center {
+	content-align: center middle;
+	align: center middle;
+}
+
+.big-score {
+    width: auto;
+    height: auto;
+    content-align: center middle;
+}
+
+/* .score-home, .score-away { */
+/*     text-style: bold; */
+/*     width: auto; */
+/* } */
+/**/
+.vs-label {
+	content-align: center middle;
+	align: center middle;
+    width: auto;
+    margin: 0 1;
+}
+
+/* .score-home.finished, .score-away.finished { */
+/*     color: $text; */
+/* } */
+/**/
+/* .score-home.draw, .score-away.draw { */
+/*     color: $warning; */
+/* } */
+/**/
+/* .card-home.winner { */
+/*     color: $success; */
+/* } */
+/**/
+/* .card-home.loser { */
+/*     color: $error; */
+/* } */
+/**/
+/* .card-away.winner { */
+/*     color: $success; */
+/* } */
+/**/
+/* .card-away.loser { */
+/*     color: $error; */
+/* } */

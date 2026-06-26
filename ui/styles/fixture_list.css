@@ -1,0 +1,35 @@
+/* PaginatedFixtureList */
+
+.page-btn {
+    height: 3;
+    min-width: 10;
+}
+
+#pagination-bar {
+    height: 3;
+    align: center middle;
+    margin: 0 1;
+}
+
+#page-info {
+    width: auto;
+    margin: 0 2;
+    content-align: center middle;
+}
+
+#cards-container {
+	align: center middle;
+	content-align: center middle;
+    height: 1fr;
+    overflow-y: auto;
+}
+
+#cards-container:empty {
+    height: 1fr;
+}
+
+.empty-label {
+    height: 1fr;
+    content-align: center middle;
+    color: $text-muted;
+}

@@ -1,0 +1,16 @@
+/* LeaguesPopup */
+
+#leagueButtons {
+    grid-size: 5 2;
+    width: 60;
+    height: auto;
+}
+
+LeaguesPopup {
+    align: center middle;
+}
+
+Button {
+	height: 100%;
+	content-align: center middle;
+}
