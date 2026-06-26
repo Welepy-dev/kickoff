@@ -49,7 +49,7 @@ class PaginatedFixtureList(Widget):
         container.remove_children()
 
         if not self._fixtures:
-            container.mount(Label("No fixtures", id="empty-label"))
+            container.mount(Label("No fixtures", classes="empty-label"))
             self.query_one("#page-info", Label).update("Page 0/0")
             self._update_buttons()
             return
