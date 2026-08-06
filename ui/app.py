@@ -60,7 +60,6 @@ class UI(App):
     def on_mount(self) -> None:
         self.query_one("#scorers-table", DataTable).add_columns("Name", "Goals", "Team", "Assists")
         self.call_after_refresh(self.load_fixtures)
-        self.call_after_refresh(self.load_scorers)
 
     @work(thread=True)
     def load_scorers(self) -> None:
@@ -143,6 +142,7 @@ class UI(App):
         self.query_one("#next-fixtures", PaginatedFixtureList).show_error(
             "Could not load fixtures"
         )
+        self.load_scorers()
 
     def _populate_tables(self, next_fixtures, previous_fixtures) -> None:
         try:
@@ -152,6 +152,7 @@ class UI(App):
 
         self.query_one("#next-fixtures", PaginatedFixtureList).load_fixtures(next_fixtures)
         self.query_one("#previous-fixtures", PaginatedFixtureList).load_fixtures(previous_fixtures)
+        self.load_scorers()
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
         if event.tab.id == "tab-next":
