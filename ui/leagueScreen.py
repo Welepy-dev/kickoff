@@ -21,7 +21,7 @@ from models.standing import parse_standings
 from models.fixture import parse_fixtures
 from models.scorer import parse_scorers
 
-from utils import get_competition_id
+from utils import get_competition_id, parse_utc
 from ui.styles import (
     style_position,
     style_standing_team,
@@ -33,6 +33,8 @@ from ui.styles import (
     style_assists,
     style_scorer_team,
 )
+
+_UNFINISHED = {"POSTPONED", "CANCELLED", "ABANDONED"}
 
 
 class LeagueScreen(Screen):
@@ -158,11 +160,15 @@ class LeagueScreen(Screen):
         previous_fixtures = []
 
         for f in fixtures:
-            dt = datetime.fromisoformat(f.date.replace("Z", "+00:00"))
-            if f.fulltime or dt < now:
-                previous_fixtures.insert(0, f)
-            else:
+            if f.fulltime:
+                previous_fixtures.append(f)
+                continue
+            dt = parse_utc(f.date)
+            if f.status in _UNFINISHED or dt is None or dt >= now:
                 next_fixtures.append(f)
+            else:
+                previous_fixtures.append(f)
+        previous_fixtures.reverse()
 
         self.app.call_from_thread(
             self._populate_fixtures, next_fixtures, previous_fixtures

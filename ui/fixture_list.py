@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widget import Widget
@@ -7,6 +5,7 @@ from textual.widgets import Button, Label
 
 from models.fixture import Fixture
 from ui.fixture_card import FixtureCard
+from utils import parse_utc
 
 
 class PaginatedFixtureList(Widget):
@@ -64,8 +63,12 @@ class PaginatedFixtureList(Widget):
             return
 
         for fixture in self._page_fixtures:
-            dt = datetime.fromisoformat(fixture.date.replace("Z", "+00:00"))
-            date_str = f"{dt.day:02d}/{dt.month:02d} {dt.hour:02d}:{dt.minute:02d}"
+            dt = parse_utc(fixture.date)
+            if dt is None:
+                date_str = "TBD"
+            else:
+                local = dt.astimezone()
+                date_str = f"{local.day:02d}/{local.month:02d} {local.hour:02d}:{local.minute:02d}"
             card = FixtureCard(
                 date_str=date_str,
                 competition=fixture.competition,

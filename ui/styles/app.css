@@ -8,7 +8,7 @@
     width: 50%;
 }
 
-Vertical{
+#main > Vertical {
     border: solid #272727;
     width: 1fr;
 }

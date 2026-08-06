@@ -18,7 +18,7 @@
 }
 
 #cards-container {
-	align: center middle;
+	align: center top;
 	content-align: center middle;
     height: 1fr;
     overflow-y: auto;

@@ -100,13 +100,16 @@ def style_goal_diff(diff: int) -> Text:
     return Text("0", style=FG_DIM)
 
 
-def style_form(form_str: str) -> Text:
+def style_form(form_str: str | list) -> Text:
     """
-    Render a form string like "W W D L W" with per-character colour.
-    Accepts a space-joined string or a list.
+    Render a form string like "WWDLW" or "W W D L W" with per-character colour.
+    Accepts a compact string, a space-joined string, or a list of tokens.
     """
     result = Text()
-    tokens = form_str.split() if isinstance(form_str, str) else form_str
+    if isinstance(form_str, str):
+        tokens = list(form_str) if " " not in form_str else form_str.split()
+    else:
+        tokens = form_str
     for token in tokens:
         if token == "W":
             result.append("W ", style=f"bold {GREEN}")

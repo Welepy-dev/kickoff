@@ -43,13 +43,12 @@ FixtureCard:hover {
     content-align: right bottom;
     text-style: bold;
 }
-/**/
-/* .card-away { */
-/*     height: 1fr; */
-/*     content-align: center bottom; */
-/*     text-style: bold; */
-/* } */
-/**/
+
+.card-away {
+    height: 1fr;
+    content-align: center bottom;
+    text-style: bold;
+}
 
 .card-center {
 	content-align: center middle;
