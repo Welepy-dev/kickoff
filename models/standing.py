@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class Standing:
     team: str
@@ -14,32 +15,38 @@ class Standing:
     goalsFor: int
     points: int
     position: int
+    form: str
 
-def parse_standings(data: list | dict) -> list[Standing]:
+
+def parse_standings(data: list | dict | None) -> list[Standing]:
     if not data:
         return []
     if isinstance(data, dict):
         data = [data]
     standings = []
     for item in data:
-        for table in item["standings"]:
-            if table["type"] != "TOTAL":
+        if not item:
+            continue
+        for table in item.get("standings") or []:
+            if table.get("type") != "TOTAL":
                 continue
-            for row in table["table"]:
+            for row in table.get("table", []):
+                team = row.get("team") or {}
                 standings.append(
                     Standing(
-                        team=row["team"]["shortName"],
-                        team_id=row["team"]["id"],
-                        competition=item["competition"]["name"],
-                        competition_id=item["competition"]["id"],
-                        playedGames=row["playedGames"],
-                        wins=row["won"],
-                        draws=row["draw"],
-                        losses=row["lost"],
-                        goalDifference=row["goalDifference"],
-                        goalsFor=row["goalsFor"],
-                        points=row["points"],
-                        position=row["position"],
+                        team=team.get("shortName") or team.get("name") or "TBD",
+                        team_id=team.get("id", 0),
+                        competition=(item.get("competition") or {}).get("name", ""),
+                        competition_id=(item.get("competition") or {}).get("id", 0),
+                        playedGames=row.get("playedGames", 0),
+                        wins=row.get("won", 0),
+                        draws=row.get("draw", 0),
+                        losses=row.get("lost", 0),
+                        goalDifference=row.get("goalDifference", 0),
+                        goalsFor=row.get("goalsFor", 0),
+                        points=row.get("points", 0),
+                        position=row.get("position", 0),
+                        form=row.get("form") or "",
                     )
                 )
     return standings
