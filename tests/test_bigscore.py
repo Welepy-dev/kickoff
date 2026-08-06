@@ -30,3 +30,11 @@ def test_zero_zero():
     result = render_score(0, 0)
     assert result  # non-empty
     assert len(result.splitlines()) == 3
+
+
+def test_negative_clamped_to_zero():
+    assert render_score(-1, 0) == render_score(0, 0)
+
+
+def test_float_coerced():
+    assert render_score(2.9, 0) == render_score(2, 0)

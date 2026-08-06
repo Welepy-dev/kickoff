@@ -1,3 +1,5 @@
+from datetime import datetime
+
 PREMIERLEAGUE_ID = 2021
 UCL_ID = 2001
 PRIMEIRALIGA_ID = 2017
@@ -35,5 +37,15 @@ def get_competition_id(competition: str) -> int:
         return LIGUE1_ID
     if competition == "Laliga":
         return LALIGA_ID
-    return 1
+    raise ValueError(f"Unknown competition: {competition!r}")
+
+
+def parse_utc(date_str: str) -> datetime | None:
+    """Parse a UTC ISO timestamp (e.g. ``2026-08-06T19:00:00Z``) to an aware datetime."""
+    if not date_str:
+        return None
+    try:
+        return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+    except ValueError:
+        return None
 

@@ -28,6 +28,7 @@ _DIGIT_GAP = " "
 
 def _number_rows(n: int) -> list[str]:
     """Return the 3 rows for a non-negative integer, digits separated by a space."""
+    n = max(0, int(n))
     digits = str(n)
     rows = ["", "", ""]
     for i, ch in enumerate(digits):
