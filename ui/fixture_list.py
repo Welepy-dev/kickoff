@@ -16,6 +16,7 @@ class PaginatedFixtureList(Widget):
         super().__init__(**kwargs)
         self._fixtures = fixtures or []
         self._current_page = 0
+        self._error: str | None = None
 
     @property
     def total_pages(self) -> int:
@@ -42,6 +43,13 @@ class PaginatedFixtureList(Widget):
     def load_fixtures(self, fixtures: list[Fixture]) -> None:
         self._fixtures = fixtures
         self._current_page = 0
+        self._error = None
+        self._render_page()
+
+    def show_error(self, message: str) -> None:
+        self._fixtures = []
+        self._current_page = 0
+        self._error = message
         self._render_page()
 
     def _render_page(self) -> None:
@@ -49,7 +57,8 @@ class PaginatedFixtureList(Widget):
         container.remove_children()
 
         if not self._fixtures:
-            container.mount(Label("No fixtures", classes="empty-label"))
+            label = self._error or "No fixtures"
+            container.mount(Label(label, classes="empty-label"))
             self.query_one("#page-info", Label).update("Page 0/0")
             self._update_buttons()
             return

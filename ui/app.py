@@ -64,7 +64,11 @@ class UI(App):
 
     @work(thread=True)
     def load_scorers(self) -> None:
-        scorers = parse_scorers(get_all_top_scorers())
+        try:
+            scorers = parse_scorers(get_all_top_scorers())
+        except Exception:
+            self.app.call_from_thread(self._show_scorers_error)
+            return
 
         # Merge duplicate players across competitions
         merged: dict[str, dict] = {}
@@ -103,10 +107,20 @@ class UI(App):
     def _populate_scorers(self, scorer_rows) -> None:
         self.query_one("#scorers-table", DataTable).add_rows(scorer_rows)
 
+    def _show_scorers_error(self) -> None:
+        self.query_one("#scorers-table", DataTable).add_row(
+            "Failed to load scorers", "-", "", ""
+        )
+
     @work(thread=True)
     def load_fixtures(self) -> None:
+        try:
+            fixtures = parse_fixtures(get_all_matches())
+        except Exception:
+            self.app.call_from_thread(self._show_fixtures_error)
+            return
+
         now = datetime.now(timezone.utc)
-        fixtures = parse_fixtures(get_all_matches())
         fixtures = sorted(fixtures, key=attrgetter('date'))
 
         next_fixtures = []
@@ -120,6 +134,15 @@ class UI(App):
                 next_fixtures.append(fixture)
 
         self.app.call_from_thread(self._populate_tables, next_fixtures, previous_fixtures)
+
+    def _show_fixtures_error(self) -> None:
+        try:
+            self.query_one("#loading").remove()
+        except Exception:
+            pass
+        self.query_one("#next-fixtures", PaginatedFixtureList).show_error(
+            "Could not load fixtures"
+        )
 
     def _populate_tables(self, next_fixtures, previous_fixtures) -> None:
         try:

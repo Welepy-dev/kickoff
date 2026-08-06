@@ -20,6 +20,7 @@ from api.endpoints import get_matches, get_standings, get_top_scorers
 from models.standing import parse_standings
 from models.fixture import parse_fixtures
 from models.scorer import parse_scorers
+
 from utils import get_competition_id
 from ui.styles import (
     style_position,
@@ -104,15 +105,18 @@ class LeagueScreen(Screen):
 
     @work(thread=True)
     def load_standings(self) -> None:
-        data = get_standings(self.league_id)
+        try:
+            data = get_standings(self.league_id)
+        except Exception:
+            self.app.call_from_thread(self._show_standings_error)
+            return
         if not data:
             return
         standings = parse_standings(data)
 
         rows = []
         for s in standings:
-            form_raw = getattr(s, "form", None) or []
-            form_str = " ".join(form_raw) if isinstance(form_raw, list) else (form_raw or "")
+            form_str = s.form or ""
             rows.append((
                 style_position(s.position),
                 style_standing_team(s.team, s.position),
@@ -129,11 +133,20 @@ class LeagueScreen(Screen):
     def _populate_standings(self, rows) -> None:
         self.query_one("#standings-table", DataTable).add_rows(rows)
 
+    def _show_standings_error(self) -> None:
+        self.query_one("#standings-table", DataTable).add_row(
+            "Failed to load standings", "", "", "", "", "", "", ""
+        )
+
     # ── fixtures ───────────────────────────────────────────────────────────
 
     @work(thread=True)
     def load_fixtures(self) -> None:
-        data = get_matches(self.league_id)
+        try:
+            data = get_matches(self.league_id)
+        except Exception:
+            self.app.call_from_thread(self._show_fixtures_error)
+            return
         if not data:
             return
         now = datetime.now(timezone.utc)
@@ -164,11 +177,24 @@ class LeagueScreen(Screen):
         self.query_one("#next-fixtures", PaginatedFixtureList).load_fixtures(next_fixtures)
         self.query_one("#previous-fixtures", PaginatedFixtureList).load_fixtures(previous_fixtures)
 
+    def _show_fixtures_error(self) -> None:
+        try:
+            self.query_one("#loading").remove()
+        except Exception:
+            pass
+        self.query_one("#next-fixtures", PaginatedFixtureList).show_error(
+            "Could not load fixtures"
+        )
+
     # ── scorers ────────────────────────────────────────────────────────────
 
     @work(thread=True)
     def load_scorers(self) -> None:
-        data = get_top_scorers(self.league_id)
+        try:
+            data = get_top_scorers(self.league_id)
+        except Exception:
+            self.app.call_from_thread(self._show_scorers_error)
+            return
         if not data:
             return
         scorers = parse_scorers(data)
@@ -188,6 +214,11 @@ class LeagueScreen(Screen):
 
     def _populate_scorers(self, rows) -> None:
         self.query_one("#scorers-table", DataTable).add_rows(rows)
+
+    def _show_scorers_error(self) -> None:
+        self.query_one("#scorers-table", DataTable).add_row(
+            "Failed to load scorers", "-", "", ""
+        )
 
     # ── actions ────────────────────────────────────────────────────────────
 
