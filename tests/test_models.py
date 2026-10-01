@@ -179,6 +179,12 @@ def _match(id, status, utc_date, home=None, away=None, matchday=1, stage="REGULA
     }
 
 
+def test_null_matchday_defaults_to_zero_and_keeps_stage():
+    f = parse_fixtures({"matches": [_match(1, "TIMED", "2026-08-06T19:00:00Z", matchday=None, stage="QUARTER_FINALS")]})[0]
+    assert f.matchweek == 0
+    assert f.stage == "QUARTER_FINALS"
+
+
 def test_split_fixtures():
     now = datetime(2026, 10, 1, 12, tzinfo=timezone.utc)
     fixtures = parse_fixtures({"matches": [

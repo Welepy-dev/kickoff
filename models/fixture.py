@@ -26,6 +26,7 @@ class Fixture:
     date: str
     fulltime: bool
     status: str
+    stage: str = ""
 
     @property
     def live(self) -> bool:
@@ -73,7 +74,7 @@ def parse_fixtures(data: list | dict | None) -> list[Fixture]:
                     competition_id=(match.get("competition") or {}).get("id", 0),
                     homeTeam=home_team,
                     awayTeam=away_team,
-                    matchweek=match.get("matchday", 0),
+                    matchweek=match.get("matchday") or 0,
                     homeTeamScore=home_score,
                     awayTeamScore=away_score,
                     score=score,
@@ -81,6 +82,7 @@ def parse_fixtures(data: list | dict | None) -> list[Fixture]:
                     date=match.get("utcDate", ""),
                     fulltime=match.get("status") == "FINISHED",
                     status=match.get("status", ""),
+                    stage=match.get("stage") or "",
                 )
             )
     return fixtures

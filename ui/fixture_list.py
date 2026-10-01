@@ -80,6 +80,7 @@ class PaginatedFixtureList(Widget):
                 is_finished=fixture.fulltime,
                 winner=fixture.winner,
                 is_live=fixture.live,
+                stage=fixture.stage,
             )
             container.mount(card)
 

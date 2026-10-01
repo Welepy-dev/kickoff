@@ -20,6 +20,7 @@ class FixtureCard(Widget):
         is_finished: bool,
         winner: str = "",
         is_live: bool = False,
+        stage: str = "",
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -33,6 +34,7 @@ class FixtureCard(Widget):
         self._is_finished = is_finished
         self._winner = winner
         self._is_live = is_live
+        self._stage = stage
 
     def _score_color(self) -> str:
         if self._winner == "DRAW":
@@ -40,6 +42,16 @@ class FixtureCard(Widget):
         if self._winner in ("HOME_TEAM", "AWAY_TEAM"):
             return "#ff3b3b"
         return "#888888"
+
+    def _round_label(self) -> str:
+        # Knockout rounds have no matchday; show the stage instead.
+        if self._matchweek:
+            label = f"{self._competition} MatchDay {self._matchweek}"
+        elif self._stage:
+            label = f"{self._competition} {self._stage.replace('_', ' ').title()}"
+        else:
+            label = self._competition
+        return f"{label} · LIVE" if self._is_live else label
 
     def compose(self) -> ComposeResult:
         with Horizontal(classes="card-body"):
@@ -52,8 +64,7 @@ class FixtureCard(Widget):
                 else:
                     yield Label("VS", classes="vs-label")
             with Vertical(classes="card-right"):
-                week = f"{self._competition} MatchDay {self._matchweek}"
-                yield Label(f"{week} · LIVE" if self._is_live else week, classes="card-week")
+                yield Label(self._round_label(), classes="card-week")
                 yield Label(self._away_team, classes="card-away")
 
     def on_mount(self) -> None:
