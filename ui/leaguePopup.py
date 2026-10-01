@@ -3,7 +3,8 @@ from textual.screen import ModalScreen
 from textual.widgets import Button
 from textual.containers import Grid
 
-class LeaguesPopup(ModalScreen[str]):
+class LeaguesPopup(ModalScreen[str | None]):
+    BINDINGS = [("escape", "cancel", "Close")]
 
     def compose(self) -> ComposeResult:
         yield Grid(
@@ -19,5 +20,9 @@ class LeaguesPopup(ModalScreen[str]):
             Button("Laliga"),
             id="leagueButtons"
         )
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         self.dismiss(str(event.button.label))
