@@ -28,6 +28,7 @@ from ui.styles import (
     style_stat,
     style_goal_diff,
     style_form,
+    style_group,
     style_scorer_name,
     style_goals,
     style_assists,
@@ -114,8 +115,13 @@ class LeagueScreen(Screen):
             return
         standings = parse_standings(data)
 
+        grouped = len({s.group for s in standings}) > 1
         rows = []
+        current_group = None
         for s in standings:
+            if grouped and s.group != current_group:
+                current_group = s.group
+                rows.append(("", style_group(s.group), "", "", "", "", "", ""))
             form_str = s.form or ""
             rows.append((
                 style_position(s.position),

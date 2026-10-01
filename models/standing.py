@@ -16,6 +16,7 @@ class Standing:
     points: int
     position: int
     form: str
+    group: str = ""
 
 
 def parse_standings(data: list | dict | None) -> list[Standing]:
@@ -47,6 +48,7 @@ def parse_standings(data: list | dict | None) -> list[Standing]:
                         points=row.get("points", 0),
                         position=row.get("position", 0),
                         form=row.get("form") or "",
+                        group=table.get("group") or "",
                     )
                 )
     return standings

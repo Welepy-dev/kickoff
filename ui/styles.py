@@ -122,6 +122,11 @@ def style_form(form_str: str | list) -> Text:
     return result
 
 
+def style_group(group: str) -> Text:
+    """Group header row, e.g. "GROUP_A" -> "Group A"."""
+    return Text(group.replace("_", " ").title(), style=f"bold {SKY}")
+
+
 # ── scorers ───────────────────────────────────────────────────────────────────
 
 def style_scorer_name(name: str, rank: int) -> Text:
