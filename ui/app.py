@@ -73,9 +73,10 @@ class UI(App):
             return
 
         # Merge duplicate players across competitions
-        merged: dict[str, dict] = {}
+        merged: dict[int | str, dict] = {}
         for scorer in scorers:
-            key = scorer.player.strip().lower()
+            # Same player across competitions; fall back to name without an id.
+            key = scorer.id or scorer.player.strip().lower()
             if key in merged:
                 merged[key]["goals"] += scorer.goals or 0
                 merged[key]["assists"] += scorer.assists or 0
