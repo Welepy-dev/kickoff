@@ -19,6 +19,7 @@ class FixtureCard(Widget):
         awayTeamScore: int,
         is_finished: bool,
         winner: str = "",
+        is_live: bool = False,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -31,6 +32,7 @@ class FixtureCard(Widget):
         self._awayTeamScore = awayTeamScore
         self._is_finished = is_finished
         self._winner = winner
+        self._is_live = is_live
 
     def _score_color(self) -> str:
         if self._winner == "DRAW":
@@ -45,12 +47,13 @@ class FixtureCard(Widget):
                 yield Label(self._date_str, classes="card-date")
                 yield Label(self._home_team, classes="card-home")
             with Horizontal(classes="card-center"):
-                if self._is_finished and self._homeTeamScore is not None and self._awayTeamScore is not None:
+                if (self._is_finished or self._is_live) and self._homeTeamScore is not None and self._awayTeamScore is not None:
                     yield BigScore(self._homeTeamScore, self._awayTeamScore, color=self._score_color(), classes="big-score")
                 else:
                     yield Label("VS", classes="vs-label")
             with Vertical(classes="card-right"):
-                yield Label(f"{self._competition} MatchDay {self._matchweek}", classes="card-week")
+                week = f"{self._competition} MatchDay {self._matchweek}"
+                yield Label(f"{week} · LIVE" if self._is_live else week, classes="card-week")
                 yield Label(self._away_team, classes="card-away")
 
     def on_mount(self) -> None:

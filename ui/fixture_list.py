@@ -79,6 +79,7 @@ class PaginatedFixtureList(Widget):
                 awayTeamScore=fixture.awayTeamScore,
                 is_finished=fixture.fulltime,
                 winner=fixture.winner,
+                is_live=fixture.live,
             )
             container.mount(card)
 

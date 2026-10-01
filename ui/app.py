@@ -1,9 +1,7 @@
-from operator import attrgetter
 from datetime import datetime, timezone
 from api.endpoints import get_all_matches, get_all_top_scorers
-from models.fixture import parse_fixtures
+from models.fixture import parse_fixtures, split_fixtures
 from models.scorer import parse_scorers
-from utils import parse_utc
 
 from textual.app import App, ComposeResult
 from textual.widgets import Label, Tabs, Tab, ContentSwitcher, DataTable, LoadingIndicator, Footer
@@ -12,8 +10,6 @@ from textual import work
 from ui.leaguePopup import LeaguesPopup
 from ui.leagueScreen import LeagueScreen
 from ui.fixture_list import PaginatedFixtureList
-
-_UNFINISHED = {"POSTPONED", "CANCELLED", "ABANDONED"}
 
 class UI(App):
 
@@ -123,22 +119,9 @@ class UI(App):
             self.app.call_from_thread(self._show_fixtures_error)
             return
 
-        now = datetime.now(timezone.utc)
-        fixtures = sorted(fixtures, key=attrgetter('date'))
-
-        next_fixtures = []
-        previous_fixtures = []
-
-        for fixture in fixtures:
-            if fixture.fulltime:
-                previous_fixtures.append(fixture)
-                continue
-            dt = parse_utc(fixture.date)
-            if fixture.status in _UNFINISHED or dt is None or dt >= now:
-                next_fixtures.append(fixture)
-            else:
-                previous_fixtures.append(fixture)
-        previous_fixtures.reverse()
+        next_fixtures, previous_fixtures = split_fixtures(
+            fixtures, datetime.now(timezone.utc)
+        )
 
         self.app.call_from_thread(self._populate_tables, next_fixtures, previous_fixtures)
 

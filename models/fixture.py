@@ -1,4 +1,13 @@
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+
+from utils import parse_utc
+
+LIVE_STATUSES = {"IN_PLAY", "PAUSED", "LIVE"}
+_NOT_STARTED = {"SCHEDULED", "TIMED"}
+# Cached data can lag behind reality: a match still marked SCHEDULED shortly
+# after kickoff is most likely being played, so keep it in "next".
+_KICKOFF_GRACE = timedelta(hours=3)
 
 
 @dataclass
@@ -17,6 +26,10 @@ class Fixture:
     date: str
     fulltime: bool
     status: str
+
+    @property
+    def live(self) -> bool:
+        return self.status in LIVE_STATUSES
 
 
 def _team_name(team: dict | None) -> str:
@@ -71,3 +84,29 @@ def parse_fixtures(data: list | dict | None) -> list[Fixture]:
                 )
             )
     return fixtures
+
+
+def split_fixtures(
+    fixtures: list[Fixture], now: datetime
+) -> tuple[list[Fixture], list[Fixture]]:
+    """Split fixtures into (next, previous).
+
+    Next: live matches, then upcoming ones by kickoff, undated ones last.
+    Previous: finished or past-dated matches (incl. postponed), newest first.
+    """
+    next_fixtures = []
+    previous_fixtures = []
+    for fixture in fixtures:
+        dt = parse_utc(fixture.date)
+        if fixture.fulltime:
+            previous_fixtures.append((fixture, dt))
+        elif fixture.live or dt is None or dt >= now:
+            next_fixtures.append((fixture, dt))
+        elif fixture.status in _NOT_STARTED and dt >= now - _KICKOFF_GRACE:
+            next_fixtures.append((fixture, dt))
+        else:
+            previous_fixtures.append((fixture, dt))
+
+    next_fixtures.sort(key=lambda p: (not p[0].live, p[1] is None, p[1] or now))
+    previous_fixtures.sort(key=lambda p: (p[1] is not None, p[1] or now), reverse=True)
+    return [f for f, _ in next_fixtures], [f for f, _ in previous_fixtures]

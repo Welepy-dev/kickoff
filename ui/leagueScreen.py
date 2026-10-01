@@ -18,10 +18,10 @@ from ui.leaguePopup import LeaguesPopup
 from ui.fixture_list import PaginatedFixtureList
 from api.endpoints import get_matches, get_standings, get_top_scorers
 from models.standing import parse_standings
-from models.fixture import parse_fixtures
+from models.fixture import parse_fixtures, split_fixtures
 from models.scorer import parse_scorers
 
-from utils import get_competition_id, parse_utc
+from utils import get_competition_id
 from ui.styles import (
     style_position,
     style_standing_team,
@@ -33,8 +33,6 @@ from ui.styles import (
     style_assists,
     style_scorer_team,
 )
-
-_UNFINISHED = {"POSTPONED", "CANCELLED", "ABANDONED"}
 
 
 class LeagueScreen(Screen):
@@ -149,26 +147,9 @@ class LeagueScreen(Screen):
         except Exception:
             self.app.call_from_thread(self._show_fixtures_error)
             return
-        if not data:
-            return
-        now = datetime.now(timezone.utc)
-
-        fixtures = parse_fixtures(data)
-        fixtures = sorted(fixtures, key=attrgetter("date"))
-
-        next_fixtures = []
-        previous_fixtures = []
-
-        for f in fixtures:
-            if f.fulltime:
-                previous_fixtures.append(f)
-                continue
-            dt = parse_utc(f.date)
-            if f.status in _UNFINISHED or dt is None or dt >= now:
-                next_fixtures.append(f)
-            else:
-                previous_fixtures.append(f)
-        previous_fixtures.reverse()
+        next_fixtures, previous_fixtures = split_fixtures(
+            parse_fixtures(data), datetime.now(timezone.utc)
+        )
 
         self.app.call_from_thread(
             self._populate_fixtures, next_fixtures, previous_fixtures

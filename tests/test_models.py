@@ -1,6 +1,8 @@
 import pytest
 
-from models.fixture import parse_fixtures
+from datetime import datetime, timezone
+
+from models.fixture import parse_fixtures, split_fixtures
 from models.standing import parse_standings
 from models.scorer import parse_scorers
 from utils import get_competition_id, parse_utc
@@ -159,3 +161,37 @@ def test_get_competition_id():
     assert get_competition_id("Champions League") == 2001
     with pytest.raises(ValueError):
         get_competition_id("Unknown League")
+
+
+# ── fixture splitting / knockout rounds ─────────────────────────────────────
+
+def _match(id, status, utc_date, home=None, away=None, matchday=1, stage="REGULAR_SEASON"):
+    return {
+        "id": id,
+        "status": status,
+        "score": {"fullTime": {"home": home, "away": away}},
+        "homeTeam": {"shortName": "H"},
+        "awayTeam": {"shortName": "A"},
+        "matchday": matchday,
+        "stage": stage,
+        "competition": {"name": "C", "id": 1},
+        "utcDate": utc_date,
+    }
+
+
+def test_split_fixtures():
+    now = datetime(2026, 10, 1, 12, tzinfo=timezone.utc)
+    fixtures = parse_fixtures({"matches": [
+        _match(1, "FINISHED", "2026-09-30T19:00:00Z", 2, 1),
+        _match(2, "IN_PLAY", "2026-10-01T11:00:00Z", 1, 0),
+        _match(3, "TIMED", "2026-10-02T19:00:00Z"),
+        _match(4, "POSTPONED", "2026-05-01T19:00:00Z"),
+        _match(5, "TIMED", "2026-10-01T10:30:00Z"),  # stale cache, likely live
+        _match(6, "TIMED", ""),
+        _match(7, "FINISHED", "2026-09-29T19:00:00Z", 0, 0),
+    ]})
+    next_fx, prev_fx = split_fixtures(fixtures, now)
+    assert [f.id for f in next_fx] == [2, 5, 3, 6]
+    assert [f.id for f in prev_fx] == [1, 7, 4]
+    assert next_fx[0].live
+
