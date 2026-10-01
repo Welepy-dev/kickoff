@@ -124,8 +124,8 @@ class LeagueScreen(Screen):
                 rows.append(("", style_group(s.group), "", "", "", "", "", ""))
             form_str = s.form or ""
             rows.append((
-                style_position(s.position),
-                style_standing_team(s.team, s.position),
+                style_position(s.position, s.table_size),
+                style_standing_team(s.team, s.position, s.table_size),
                 style_stat(s.playedGames),
                 style_stat(s.wins),
                 style_stat(s.draws),

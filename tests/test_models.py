@@ -202,7 +202,7 @@ def test_split_fixtures():
     assert next_fx[0].live
 
 
-def test_standings_keep_group():
+def test_standings_keep_group_and_table_size():
     data = {
         "competition": {"name": "World Cup", "id": 2000},
         "standings": [
@@ -211,4 +211,4 @@ def test_standings_keep_group():
         ],
     }
     s = parse_standings(data)
-    assert [x.group for x in s] == ["GROUP_A", "GROUP_A", "GROUP_B"]
+    assert [(x.group, x.table_size) for x in s] == [("GROUP_A", 2), ("GROUP_A", 2), ("GROUP_B", 1)]

@@ -68,20 +68,25 @@ def style_time(time_str: str) -> Text:
 
 # ── standings ─────────────────────────────────────────────────────────────────
 
-def style_position(pos: int) -> Text:
+def _in_bottom_three(pos: int, table_size: int) -> bool:
+    """Bottom 3 of a league table; small cup groups have no relegation."""
+    return table_size >= 10 and pos > table_size - 3
+
+
+def style_position(pos: int, table_size: int = 20) -> Text:
     """Top 4 in sky (Champions League spots), bottom 3 in rose (relegation)."""
     if pos <= 4:
         return Text(str(pos), style=f"bold {SKY}")
-    if pos >= 18:
+    if _in_bottom_three(pos, table_size):
         return Text(str(pos), style=ROSE)
     return Text(str(pos), style=FG_DIM)
 
 
-def style_standing_team(name: str, pos: int) -> Text:
+def style_standing_team(name: str, pos: int, table_size: int = 20) -> Text:
     """Bold for CL positions, rose for relegation, normal otherwise."""
     if pos <= 4:
         return Text(name, style=f"bold {FG}")
-    if pos >= 18:
+    if _in_bottom_three(pos, table_size):
         return Text(name, style=ROSE)
     return Text(name, style=FG)
 

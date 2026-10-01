@@ -17,6 +17,7 @@ class Standing:
     position: int
     form: str
     group: str = ""
+    table_size: int = 0
 
 
 def parse_standings(data: list | dict | None) -> list[Standing]:
@@ -31,7 +32,8 @@ def parse_standings(data: list | dict | None) -> list[Standing]:
         for table in item.get("standings") or []:
             if table.get("type") != "TOTAL":
                 continue
-            for row in table.get("table", []):
+            rows = table.get("table", [])
+            for row in rows:
                 team = row.get("team") or {}
                 standings.append(
                     Standing(
@@ -49,6 +51,7 @@ def parse_standings(data: list | dict | None) -> list[Standing]:
                         position=row.get("position", 0),
                         form=row.get("form") or "",
                         group=table.get("group") or "",
+                        table_size=len(rows),
                     )
                 )
     return standings
