@@ -48,8 +48,11 @@ def get(path: str, params=None):
             timeout=_TIMEOUT,
         )
         if response.status_code == 429 and attempt < _MAX_RETRIES - 1:
-            retry_after = response.headers.get("Retry-After")
-            delay = float(retry_after) if retry_after else 2 ** attempt
+            try:
+                delay = float(response.headers["Retry-After"])
+            except (KeyError, ValueError):
+                # Missing, or the HTTP-date form of the header.
+                delay = 2 ** attempt
             time.sleep(delay)
             continue
         response.raise_for_status()
